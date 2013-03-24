@@ -14,7 +14,8 @@
     <Server>Custom</Server>
     <CustomServerUrl>http://scores.worldesports.net/</CustomServerUrl>
     <PublishEvent>BeforeRun</PublishEvent>
-    <PublishBeforeDebugProfile>lolscores.worldesports.net</PublishBeforeDebugProfile>
+    <PublishBeforeDebugProfile>
+    </PublishBeforeDebugProfile>
     <PHPDevAutoPort>True</PHPDevAutoPort>
     <PHPDevPort>13993</PHPDevPort>
   </PropertyGroup>
