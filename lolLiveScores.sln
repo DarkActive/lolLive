@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{A0786B88-2ADB-4C21-ABE8-AA2D79766269}") = "lolLiveScores", "lolLiveScores.phpproj", "{D4D68D65-6E08-425B-A8EF-E5695E0F58B1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D4D68D65-6E08-425B-A8EF-E5695E0F58B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4D68D65-6E08-425B-A8EF-E5695E0F58B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4D68D65-6E08-425B-A8EF-E5695E0F58B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4D68D65-6E08-425B-A8EF-E5695E0F58B1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
