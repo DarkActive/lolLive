@@ -31,7 +31,7 @@ $time = explode(' ', $time);
 $time = $time[1] + $time[0];
 $start = $time;
 
-if ($matchImg->cropCheck() != false)
+if ($matchImg->cropCheck() == false)
 {
     $query = 'UPDATE livegame SET ' . 
             'live="' . 0 . '" ' .
@@ -103,7 +103,7 @@ function getTeamName($bteam)
         $bTeamName = "compLexity";
     elseif ($bteam == "GGU")
         $bTeamName = "Good Game University";
-    elseif ($bteam == "VCN")
+    elseif ($bteam == "VUL")
         $bTeamName = "Vulcun Command";
     else
         $bTeamName = "Unknown";

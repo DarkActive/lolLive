@@ -21,7 +21,7 @@ class Res1080P
     const X_BTEAM2_CORD = 481;
     const Y_BTEAM2_CORD = 4;
     const X_RTEAM2_CORD = 1318;
-    const Y_RTEAM2_CORD = 4;
+    const Y_RTEAM2_CORD = 8;
     #endregion
     
     #region Game Time
@@ -101,6 +101,6 @@ class Res1080P
 
 class GenConfig
 {
-    static $ValidTeams = array("TSM", "VCN", "COL", "CRS", "DIG", "CLG", "MRN", "GGU");
+    static $ValidTeams = array("TSM", "VUL", "COL", "CRS", "DIG", "CLG", "MRN", "GGU");
 }
 ?>

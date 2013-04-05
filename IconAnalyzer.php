@@ -184,13 +184,24 @@ class IconAnalyzer
             $master = imagecreatefromjpeg($this->origImg);
             
             imagecopy($canvas, $master, 0, 0, $x_crop, $y_crop, $this->origWidth, $this->origHeight);
-            imagefilter($canvas, IMG_FILTER_GRAYSCALE);
-            imagejpeg($canvas, 'crop/team/' . $team . '-gold.jpg', 100);
-            
-            exec('convert crop/team/' . $team . '-gold.jpg -unsharp 10x3.2+2.5+0.001 crop/team/' . $team . '-gold.jpg');
-            exec('convert crop/team/' . $team . '-gold.jpg -resize 150x43 crop/team/' . $team . '-gold.jpg');
-            exec('convert crop/team/' . $team . '-gold.jpg -unsharp 15x3.9+4.0+0.001 crop/team/' . $team . '-gold.jpg');
-            exec('convert crop/team/' . $team . '-gold.jpg -unsharp 200x14.1+1.0+0.001 crop/team/' . $team . '-gold.jpg');
+
+            if ($team == "red" || $team == "blue")
+            {
+                // Red seems to be unreadable by OCR, so convert to grayscale
+                // and apply proper sharpening so OCR can read it correctly.
+                imagefilter($canvas, IMG_FILTER_GRAYSCALE);
+                imagejpeg($canvas, 'crop/team/' . $team . '-gold.jpg', 100);
+
+                exec('convert crop/team/' . $team . '-gold.jpg -unsharp 10x3.2+2.5+0.001 crop/team/' . $team . '-gold.jpg');
+                exec('convert crop/team/' . $team . '-gold.jpg -resize 150x43 crop/team/' . $team . '-gold.jpg');
+                exec('convert crop/team/' . $team . '-gold.jpg -unsharp 15x3.9+4.0+0.001 crop/team/' . $team . '-gold.jpg');
+                exec('convert crop/team/' . $team . '-gold.jpg -unsharp 200x14.1+1.0+0.001 crop/team/' . $team . '-gold.jpg');
+            }
+            else
+            {
+                imagejpeg($canvas, 'crop/team/' . $team . '-gold.jpg', 100);
+                exec('convert crop/team/' . $team . '-gold.jpg -resize 150x43 crop/team/' . $team . '-gold.jpg');
+            }
         }
         else
         {
@@ -398,9 +409,7 @@ class IconAnalyzer
             $master = imagecreatefromjpeg($this->origImg);
             
             imagecopy($canvas, $master, 0, 0, $x_crop, $y_crop, $this->origWidth, $this->origHeight);
-            $resize = imagecreatetruecolor(Res1080P::W_CSCORE * 3, Res1080P::H_CSCORE * 3);
-            imagecopyresampled($resize, $canvas, 0, 0, 0, 0, Res1080P::W_CSCORE * 3, Res1080P::H_CSCORE * 3, Res1080P::W_CSCORE, Res1080P::H_CSCORE);
-            imagejpeg($resize, 'crop/cscore/' . $team . $index . '.jpg', 100);    
+            imagejpeg($canvas, 'crop/cscore/' . $team . $index . '.jpg', 100);    
         }
         else
         {
@@ -453,7 +462,7 @@ class IconAnalyzer
         if ($team == "blue" || $team == "red")
         {
             $img = 'crop/team/' . $team . '-gold.jpg';
-            
+
             unlink('out.txt');
             exec('tesseract ' . $img . ' out -l eng -psm 7');
             
@@ -465,9 +474,12 @@ class IconAnalyzer
                 $buffer = str_replace("\n", "", $buffer);
                 fclose($handle);
             }
+
+            echo ("Orig Gold " . $team . ": " . $buffer . "<br/>");
             
             $buffer = str_replace(";,", ".7", $buffer);
                 
+            $buffer = str_replace("}:", "k", $buffer);
             $buffer = str_replace(",", "", $buffer);
             $buffer = str_replace("'", "", $buffer);
             $buffer = str_replace('"', "", $buffer);
@@ -488,6 +500,7 @@ class IconAnalyzer
             $buffer = str_replace("1(", "k", $buffer);
             $buffer = str_replace("1<", "k", $buffer);
             $buffer = str_replace("k.", "k", $buffer);
+            $buffer = str_replace("}", "k", $buffer);
             $buffer = str_replace("“", "k", $buffer);
             $buffer = str_replace("~", "", $buffer);
             $buffer = str_replace("..", ".", $buffer);
@@ -542,7 +555,7 @@ class IconAnalyzer
         {
             $img = 'crop/team/' . $team . '.jpg';
             unlink('out.txt');
-            exec('tesseract ' . $img . ' out -l eng -psm 7');
+            exec('tesseract ' . $img . ' out -l lolfont -psm 7');
             
             $buffer = "-1";
             $handle = @fopen('out.txt', 'r');
@@ -552,12 +565,12 @@ class IconAnalyzer
                 $buffer = str_replace("\n", "", $buffer);
                 fclose($handle);
             }
-            
+
             // Incorrect Read Fixes
             $buffer = str_replace("5", "S", $buffer);
             $buffer = str_replace("|", "I", $buffer);
             $buffer = strtoupper($buffer);
-            
+
             return $buffer;
         }
         
@@ -567,7 +580,6 @@ class IconAnalyzer
     private function timeToText()
     {
         $img = 'crop/team/time.jpg';
-        $this->applyPMDUnsharp($img);
         exec('convert ' . $img . ' -resize 120x54 ' . $img);
         unlink('out.txt');
         exec('tesseract ' . $img . ' out -l eng -psm 7');
@@ -583,7 +595,7 @@ class IconAnalyzer
         
         // If not found, or found bogus characters, try PMDUnsharp
         $numtest = str_replace(":", "", $buffer);
-        if ($buffer == "" && !ctype_digit($numtest))
+        if ($buffer == "" || !ctype_digit($numtest))
         {
             $this->applyPMDUnsharp($img);
             unlink('out.txt');
@@ -597,8 +609,9 @@ class IconAnalyzer
             }
         }
         
-        echo "ORIG Time: " . $buffer;
+        echo "ORIG Time: " . $buffer . "<br />";
         
+
         // weird case where 1!) == 00
         $buffer = str_replace("1!)", "00", $buffer);
         
@@ -634,6 +647,7 @@ class IconAnalyzer
     
     private function imageToText($img)
     {
+        exec('convert ' . $img . ' -resize 78x48 ' . $img);
         unlink('out.txt');
         exec('tesseract ' . $img . ' out -l lolnum -psm 7');
         
@@ -668,7 +682,6 @@ class IconAnalyzer
     
     private function imageToTextScore($img)
     {
-        $this->applyPMDUnsharp($img);
         exec('convert ' . $img . ' -resize 270x48 ' . $img);
         unlink('out.txt');
         exec('tesseract ' . $img . ' out -l lolslash -psm 7');
@@ -696,6 +709,8 @@ class IconAnalyzer
                 fclose($handle);
             }
         }
+
+        $buffer = str_replace("O", "0", $buffer);
         
         return $buffer;
     }
@@ -1152,6 +1167,10 @@ class IconAnalyzer
         
         // On kills and maybe also deaths & assists, "0" seems to be read as "63" (since 63 unlikely kills, just do regular replace).
         $score_arr['kills'] = str_replace("63", "0", $score_arr['kills']);
+
+        // On kills for support, sometimes "0" is read as "13", so replace only on support where 13 unlikely kills
+        if ($id == 4)
+            $score_arr['kills'] = str_replace("13", "0", $score_arr['kills']);
         
         // Remove random digits after 0
         if (strlen($score_arr['kills']) > 1 && substr($score_arr['kills'], 0, 1) == "0")
